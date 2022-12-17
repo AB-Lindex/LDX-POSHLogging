@@ -2,7 +2,7 @@
 <package >
   <metadata>
     <id>LDXLogging</id>
-    <version>1.1.2</version>
+    <version>0.99</version>
     <authors>Leif Almberg</authors>
     <owners>AB Lindex, IT TS</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
