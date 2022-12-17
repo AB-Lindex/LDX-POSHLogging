@@ -67,8 +67,11 @@ Write-Log -LogEntry "Entry 01" -LogFileParameters $LogParams -LogFile $LogFile
         $LogFileParameters
     )
 
+    [bool]$LogTodo = $false
+    [bool]$HouseKeepingTodo = $false
+
     if ($LogEntry) { 
-        if ( -not ($MyInvocation.ScriptName)) {
+         if ( -not ($MyInvocation.ScriptName)) {
             Write-Output "This command has to run from a script, not from the command line"
         } else
         {
@@ -102,10 +105,11 @@ Write-Log -LogEntry "Entry 01" -LogFileParameters $LogParams -LogFile $LogFile
     } 
 
     if ($LogFileParameters.HouseKeeping) {
+        $HouseKeepingTodo = $true
         Invoke-LogFileHouseKeeping $LogFileParameters.DaysToKeep $LogFileParameters.RunsToKeep
     }
-    if (!($LogEntry) -and !($LogFileParameters.HouseKeeping)) {
-                write-output "Nothing to log, use get-help write-log for parameters."
+    if (!($LogTodo) -and !($HouseKeepingTodo)) {
+        write-output "Nothing to log, use get-help write-log for parameters."
     }
 }
 
