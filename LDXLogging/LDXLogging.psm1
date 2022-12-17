@@ -26,7 +26,7 @@ Scenario: Log output to screen, daily logfile and syslog.
 Housekeeping, keep the last 90 days. 
 Send email to opsgenie@lindex.com if an error (Severity 'Critical') is logged in the script.
 
-$LogParams = New-LogFileParameters -tee $true -DailyLogFile $true -HouseKeeping $true -DaysToKeep 90 -Syslog $true -SyslogFacility 20 -AlertEmail opsgenie@lindex.com
+$LogParams = New-LogFileParameters -tee -DailyLogFile -HouseKeeping -DaysToKeep 90 -Syslog -SyslogFacility 20 -AlertEmail opsgenie@lindex.com
 Write-Log -LogEntry "Entry 01" -Severity Critical -LogFileParameters $LogParams
 
 Please see help for New-LogFileParameters for detailed Syslog help.
@@ -45,7 +45,7 @@ See 'New-LogFileCurrentRunName' for details of Logfile name creation.
 Note that only 'tee' is a parameter in this case since the other command-line arguments
 are handled with 'Write-Log' parameters.
 
-$LogParams = New-LogFileParameters -tee $true
+$LogParams = New-LogFileParameters -tee
 $LogFile = New-LogFileCurrentRunName
 
 Write-Log -LogEntry "Entry 01" -LogFileParameters $LogParams -LogFile $LogFile
@@ -125,7 +125,7 @@ Scenario: Log Output to screen, daily logfile and syslog.
 Housekeeping, keep the last 90 days. 
 Send email to opsgenie@lindex.com if an error (Severity 'Critical') is logged in the script.
 
-$LogParams = New-LogFileParameters -tee $true -DailyLogFile $true -HouseKeeping $true -DaysToKeep 90 -Syslog $true -SyslogFacility 20 -AlertEmail opsgenie@lindex.com
+$LogParams = New-LogFileParameters -tee -DailyLogFile -HouseKeeping -DaysToKeep 90 -Syslog -SyslogFacility 20 -AlertEmail opsgenie@lindex.com
 
 .Example
 Scenario: Do not log output to screen
@@ -133,13 +133,13 @@ Log to a new logfile for each time the script is processed.
 No housekeeping.
 No email if an error (Severity 'Critical') is logged in the script.
 
-$LogParams = New-LogFileParameters -tee $false -DailyLogFile $false -HouseKeeping $false
+$LogParams = New-LogFileParameters
 
 .Example
 Scenario: Log Output to screen, daily logfile and no syslog.
 Housekeeping, keep the last 20 logfiles, regardless of timestamps.
 
-$LogParams = New-LogFileParameters -tee $true -DailyLogFile $true -HouseKeeping $true -RunsToKeep 20
+$LogParams = New-LogFileParameters -tee -DailyLogFile -HouseKeeping -RunsToKeep 20
 
 #>
 
