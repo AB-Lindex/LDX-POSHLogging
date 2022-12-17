@@ -99,10 +99,13 @@ Write-Log -LogEntry "Entry 01" -LogFileParameters $LogParams -LogFile $LogFile
                 Send-Email $Subject $LogEntryFormat $LogFileParameters.AlertEmail $LogFileParameters.SMTPServer $LogFileParameters.ReplyTo
             }
         }
-    }
+    } 
 
     if ($LogFileParameters.HouseKeeping) {
         Invoke-LogFileHouseKeeping $LogFileParameters.DaysToKeep $LogFileParameters.RunsToKeep
+    }
+    if (!($LogEntry) -and !($LogFileParameters.HouseKeeping)) {
+                write-output "Nothing to log, use get-help write-log for parameters."
     }
 }
 
