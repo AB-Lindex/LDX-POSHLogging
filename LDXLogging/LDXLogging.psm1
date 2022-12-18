@@ -385,7 +385,11 @@ Function Invoke-LogFileHouseKeeping {
         $RunsToKeep,
         [Parameter(Mandatory=$false)]
         [int]
-        $MegaBytesToKeep
+        $MegaBytesToKeep,
+        [Parameter(Mandatory=$false)]
+        [switch]
+        $list
+        
     )
 
     if (-not ($LogFilesFolder)) {
@@ -402,17 +406,19 @@ Function Invoke-LogFileHouseKeeping {
         if ($DaysToKeep) {
             foreach ($file in Get-ChildItem -Path $LogFileDirectory -Recurse:$Recurse) { 
                 if ($file.lastwritetime -le (get-date).AddDays(-$DaysToKeep)) {
-                    remove-item -path (Join-Path -Path $file.Directory -ChildPath $file) -Force
+                    remove-item -path (Join-Path -Path $file.Directory -ChildPath $file) -Force 
+                    #list what to delete will be added
                 } 
             }
         }
 
         if ($RunsToKeep) { # t.ex. max 10 filer per katalog, rekursivt, är målet
             Get-ChildItem -Path $LogFileDirectory -Recurse:$Recurse | sort LastWriteTime | select -first ((Get-ChildItem -Path $LogFileDirectory | measure).count -$RunsToKeep) | remove-item -Force
+                    #list what to delete will be added
         }
 
         if ($MegaBytesToKeep) {
-            "megabyte"
+            "To be created"
         }
     } else {
         Write-Output "No LogFilesFolder as argument and not running from a script, nothing to do."
