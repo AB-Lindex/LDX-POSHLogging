@@ -404,17 +404,24 @@ Function Invoke-LogFileHouseKeeping {
     }
     if ($LogFileDirectory) {
         if ($DaysToKeep) {
-            foreach ($file in Get-ChildItem -Path $LogFileDirectory -Recurse:$Recurse) { 
+            foreach ($file in Get-ChildItem -Path $LogFileDirectory -File -Recurse:$Recurse) { 
                 if ($file.lastwritetime -le (get-date).AddDays(-$DaysToKeep)) {
-                    remove-item -path (Join-Path -Path $file.Directory -ChildPath $file) -Force 
-                    #list what to delete will be added
+                    if ($List) {
+                        $file
+                    } else {
+                        remove-item -path $file -Force 
+                    }
                 } 
             }
         }
 
         if ($RunsToKeep) {
-            Get-ChildItem -Path $LogFileDirectory -Recurse:$Recurse | Sort-Object LastWriteTime | Select-Object -first ((Get-ChildItem -Path $LogFileDirectory | Measure-Object).count -$RunsToKeep) | remove-item -Force
-                    #list what to delete will be added
+            $files = (Get-ChildItem -Path $LogFileDirectory -Recurse:$Recurse | Sort-Object LastWriteTime | Select-Object -first ((Get-ChildItem -Path $LogFileDirectory | Measure-Object).count -$RunsToKeep))
+            if ($List) {
+                $files
+            } else {
+                $files | remove-item -Force
+            }
         }
 
         if ($MegaBytesToKeep) {
