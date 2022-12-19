@@ -14,7 +14,7 @@ Since a plethora of parameters are available, and perhaps needed (depending on y
 See examples for details.
 
 .Example
-Scenario: Log output to screen (tee) and daily logfile. No parameters are needed, this is default.
+Scenario: Log output to screen (Tee) and daily logfile. No parameters are needed, this is default.
 please note that no housekeeping will take place.
 
 Write-Log -LogEntry "Entry 01"
@@ -26,7 +26,7 @@ Scenario: Log output to screen, daily logfile and syslog.
 Housekeeping, keep the last 90 days. 
 Send email to opsgenie@lindex.com if an error (Severity 'Critical') is logged in the script.
 
-$LogParams = New-LogFileParameters -tee -DailyLogFile -HouseKeeping -DaysToKeep 90 -Syslog -SyslogFacility 20 -AlertEmail opsgenie@lindex.com
+$LogParams = New-LogFileParameters -Tee -DailyLogFile -HouseKeeping -DaysToKeep 90 -Syslog -SyslogFacility 20 -AlertEmail opsgenie@lindex.com
 Write-Log -LogEntry "Entry 01" -Severity Critical -LogFileParameters $LogParams
 
 Please see help for New-LogFileParameters for detailed Syslog help.
@@ -42,10 +42,10 @@ The LogFile created in the example will be stored in the subfolder 'logfiles' wi
 with date and time to the nearest second, in order to create a new logfile for each run.
 See 'New-LogFileCurrentRunName' for details of Logfile name creation.
 
-Note that only 'tee' is a parameter in this case since the other command-line arguments
+Note that only 'Tee' is a parameter in this case since the other command-line arguments
 are handled with 'Write-Log' parameters.
 
-$LogParams = New-LogFileParameters -tee
+$LogParams = New-LogFileParameters -Tee
 $LogFile = New-LogFileCurrentRunName
 
 Write-Log -LogEntry "Entry 01" -LogFileParameters $LogParams -LogFile $LogFile
@@ -76,7 +76,7 @@ Write-Log -LogEntry "Entry 01" -LogFileParameters $LogParams -LogFile $LogFile
         } else
         {
             $LogEntryFormat = (Set-LogEntryFormat $LogEntry $Severity)
-            $BaseName=(Get-Item $MyInvocation.ScriptName).basename
+            $BaseName=(Get-Item $MyInvocation.ScriptName).BaseName
         
             if (-not $LogFile) {
                 if ($LogFileParameters.DailyLogFile -or -not ($LogFileParameters)) {
@@ -132,7 +132,7 @@ Scenario: Log Output to screen, daily logfile and syslog.
 Housekeeping, keep the last 90 days. 
 Send email to opsgenie@lindex.com if an error (Severity 'Critical') is logged in the script.
 
-$LogParams = New-LogFileParameters -tee -DailyLogFile -HouseKeeping -DaysToKeep 90 -Syslog -SyslogFacility 20 -AlertEmail opsgenie@lindex.com
+$LogParams = New-LogFileParameters -Tee -DailyLogFile -HouseKeeping -DaysToKeep 90 -Syslog -SyslogFacility 20 -AlertEmail opsgenie@lindex.com
 
 .Example
 Scenario: Do not log output to screen
@@ -146,14 +146,14 @@ $LogParams = New-LogFileParameters
 Scenario: Log Output to screen, daily logfile and no syslog.
 Housekeeping, keep the last 20 logfiles, regardless of timestamps.
 
-$LogParams = New-LogFileParameters -tee -DailyLogFile -HouseKeeping -RunsToKeep 20
+$LogParams = New-LogFileParameters -Tee -DailyLogFile -HouseKeeping -RunsToKeep 20
 
 #>
 
     param(
         [Parameter(Mandatory=$false)]
         [switch]
-        $tee,
+        $Tee,
         [Parameter(Mandatory=$false)]
         [switch]
         $DailyLogFile,
@@ -204,7 +204,7 @@ $LogParams = New-LogFileParameters -tee -DailyLogFile -HouseKeeping -RunsToKeep 
         [string]$SyslogServer
     }
     $Parameters = New-Object LdxLogParameters
-    $Parameters.tee=$tee
+    $Parameters.Tee=$Tee
     $Parameters.DailyLogFile=$DailyLogFile
     $Parameters.HouseKeeping=$HouseKeeping
     $Parameters.DaysToKeep=$DaysToKeep
@@ -245,8 +245,8 @@ C:\Script\logfiles\Action_20200331-142031.log
 #>
 
     $WorkingDir=(Split-Path -Parent $MyInvocation.ScriptName)
-    $BaseName=(Get-Item $MyInvocation.ScriptName).basename
-    $LogfileName = $baseName + "_" + (get-date -Format "yyyyMMdd-HHmmss") + ".log"
+    $BaseName=(Get-Item $MyInvocation.ScriptName).BaseName
+    $LogfileName = $BaseName + "_" + (get-date -Format "yyyyMMdd-HHmmss") + ".log"
 
     return (Join-Path -Path (Get-LogFileDirectory $WorkingDir) -ChildPath $LogfileName)
 }
@@ -258,9 +258,9 @@ Function New-DailyLogfileName {
         $WorkingDir,
         [Parameter(Mandatory=$true)]
         [string]
-        $baseName
+        $BaseName
     )
-    $LogfileName = $baseName + "_" + (get-date -Format "yyyyMMdd") + ".log"
+    $LogfileName = $BaseName + "_" + (get-date -Format "yyyyMMdd") + ".log"
 
     return (Join-Path -Path (Get-LogFileDirectory $WorkingDir) -ChildPath $LogfileName)
 }
@@ -388,7 +388,7 @@ Function Invoke-LogFileHouseKeeping {
         $MegaBytesToKeep,
         [Parameter(Mandatory=$false)]
         [switch]
-        $list
+        $List
         
     )
 
@@ -412,8 +412,8 @@ Function Invoke-LogFileHouseKeeping {
             }
         }
 
-        if ($RunsToKeep) { # t.ex. max 10 filer per katalog, rekursivt, är målet
-            Get-ChildItem -Path $LogFileDirectory -Recurse:$Recurse | sort LastWriteTime | select -first ((Get-ChildItem -Path $LogFileDirectory | measure).count -$RunsToKeep) | remove-item -Force
+        if ($RunsToKeep) {
+            Get-ChildItem -Path $LogFileDirectory -Recurse:$Recurse | Sort-Object LastWriteTime | Select-Object -first ((Get-ChildItem -Path $LogFileDirectory | Measure-Object).count -$RunsToKeep) | remove-item -Force
                     #list what to delete will be added
         }
 
