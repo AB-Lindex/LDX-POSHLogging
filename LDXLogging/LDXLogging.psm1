@@ -425,7 +425,19 @@ Function Invoke-LogFileHouseKeeping {
         }
 
         if ($MegaBytesToKeep) {
-            "To be created"
+            $ActualMegaBytesToKeep = $MegaBytesToKeep * 1024 * 1024
+            $files = Get-ChildItem -Path $LogFileDirectory -Recurse:$false | Sort-Object LastWriteTime
+            $sum = (($files | Measure-Object -Sum Length).Sum)
+            $n=0
+            while (($sum -gt $ActualMegaBytesToKeep) -or ($n -gt $files.count)) {
+                $sum = $sum - $files[$n].Length
+                if ($List) {
+                    $files[$n]
+                } else {
+                    $files[$n] | remove-item -Force
+                }
+                $n++
+            }
         }
     } else {
         Write-Output "No LogFilesFolder as argument and not running from a script, nothing to do."
