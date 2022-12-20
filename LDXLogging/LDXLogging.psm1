@@ -52,7 +52,8 @@ Write-Log -LogEntry "Entry 01" -LogFileParameters $LogParams -LogFile $LogFile
 #>
 
     Param(
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false,
+        ValueFromPipeline=$true)]
         [string]
         $LogEntry,
         [Parameter(Mandatory=$false)]
@@ -313,7 +314,7 @@ function Write-LogEntryLogFile {
         $LogFile
     )
 
-    $LogEntry | Out-File -FilePath $LogFile -Append
+    $LogEntry | Out-File -FilePath $LogFile -Append -Force
 }
 
 function Send-Email {
@@ -409,7 +410,7 @@ Function Invoke-LogFileHouseKeeping {
                     if ($List) {
                         $file
                     } else {
-                        remove-item -path $file -Force 
+                        remove-item -path (Join-Path -Path $file.Directory -ChildPath $file) -Force 
                     }
                 } 
             }
