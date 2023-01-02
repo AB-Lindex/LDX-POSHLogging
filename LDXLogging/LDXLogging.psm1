@@ -74,8 +74,8 @@ Write-Log -LogEntry "Entry 01" -LogFileParameters $LogParams -LogFile $LogFile
     if ($LogEntry) { 
          if ( -not ($MyInvocation.ScriptName)) {
             Write-Output "This command has to run from a script, not from the command line"
-        } else
-        {
+        } else {
+            $LogTodo = $true
             $LogEntryFormat = (Set-LogEntryFormat $LogEntry $Severity)
             $BaseName=(Get-Item $MyInvocation.ScriptName).BaseName
         
@@ -99,7 +99,7 @@ Write-Log -LogEntry "Entry 01" -LogFileParameters $LogParams -LogFile $LogFile
             }
 
             if ($LogFileParameters.AlertEmail -and $Severity -eq 'Critical') {
-                $Subject=$ScriptBaseName=$MyInvocation.Scriptname + " encountered an error"
+                $Subject=$MyInvocation.Scriptname + " encountered an error"
                 Send-Email $Subject $LogEntryFormat $LogFileParameters.AlertEmail $LogFileParameters.SMTPServer $LogFileParameters.ReplyTo
             }
         }
