@@ -175,6 +175,7 @@ $LogParams = New-LogFileParameters -Tee -DailyLogFile -HouseKeeping -RunsToKeep 
         $Syslog,
         [Parameter(Mandatory=$false)]
         [int]
+        [ValidateRange(16,23)]
         $SyslogFacility,
         [Parameter(Mandatory=$false)]
         [string]
@@ -287,6 +288,7 @@ function Write-SyslogEntry {
         $LogEntry,
         [Parameter(Mandatory=$true)]
         [int]
+        [ValidateRange(16,23)]
         $SyslogFacility,
         [Parameter(Mandatory=$false)]
         [string]
@@ -295,13 +297,19 @@ function Write-SyslogEntry {
         [string]
         $SyslogServer
     )
+    $LogLevel = "emergency", "alert", "critical", "error", "warning", "notice", "info", "debug"
+    [int]$SeverityLevel = [array]::IndexOf($LogLevel,$Severity.ToLower())
+    if ($SeverityLevel -eq -1) { $SeverityLevel = 6 }
+    [int]$Facility = $SyslogFacility * 8
+    $SyslogCode = $Facility + $SeverityLevel
 
-    [string[]]$SyslogMsg = ("<" + $SyslogFacility*8 + ">"+ $Severity +":"),$LogEntry
+    [string[]]$SyslogMsg = ("<" + $SyslogCode + ">"),":" + $LogEntry
     [byte[]]$RawMsg=[System.Text.Encoding]::ASCII.GetBytes($SyslogMsg)
 
     $UDPCLient = New-Object System.Net.Sockets.UdpClient
     $UDPCLient.Connect($SyslogServer, '514')
     $UDPCLient.Send($RawMsg, $rawmsg.Length) | Out-Null
+
 }
 
 function Write-LogEntryLogFile {
