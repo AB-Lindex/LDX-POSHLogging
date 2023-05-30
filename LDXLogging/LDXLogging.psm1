@@ -6,7 +6,7 @@ Lindex Powershell Module for Logging standardization
 
 .Description
 Write-Log writes log entries to screen, logfile and syslog depending on the setup.
-The logfiles are located in the subfolder 'logfiles' of the script that is being processed.
+The logfiles are located in the subfolder 'logfiles' of the script that is being processed, or a custom path.
 Please note that you cannot test the function Write-Log at the prompt, since a script, and its path, 
 are mandatory for Write-Log to extract in order to log correctly.
 
@@ -81,8 +81,13 @@ Write-Log -LogEntry "Entry 01" -LogFileParameters $LogParams -LogFile $LogFile
         
             if (-not $LogFile) {
                 if ($LogFileParameters.DailyLogFile -or -not ($LogFileParameters)) {
-                    $WorkingDir=(Split-Path -Parent $MyInvocation.ScriptName)
-                    $Logfile = (New-DailyLogfileName $WorkingDir $BaseName)
+                    if ( -not ($LogFileParameters.LogPath)) {
+                        $WorkingDir=(Split-Path -Parent $MyInvocation.ScriptName)
+                        $Logfile = (New-DailyLogfileName $WorkingDir $BaseName)
+                    } else {
+                        $Logfile = (New-CustomDailyLogfileName $LogFileParameters.LogPath $BaseName)
+                    }
+                    
                 }
             }
 
@@ -149,6 +154,12 @@ Housekeeping, keep the last 20 logfiles, regardless of timestamps.
 
 $LogParams = New-LogFileParameters -Tee -DailyLogFile -HouseKeeping -RunsToKeep 20
 
+.Example
+Scenario: Log Output to screen, daily logfile and no syslog. Log to a custom folder. 
+Housekeeping, keep the last 20 logfiles.
+
+$LogParams = New-LogFileParameters -Tee -DailyLogFile -HouseKeeping -RunsToKeep 20
+
 #>
 
     param(
@@ -188,8 +199,10 @@ $LogParams = New-LogFileParameters -Tee -DailyLogFile -HouseKeeping -RunsToKeep 
         $ReplyTo,
         [Parameter(Mandatory=$false)]
         [string]
-        $SyslogServer
-
+        $SyslogServer,
+        [Parameter(Mandatory=$false)]
+        [string]
+        $LogPath
     )
     class LdxLogParameters {
         [bool]$tee
@@ -204,6 +217,7 @@ $LogParams = New-LogFileParameters -Tee -DailyLogFile -HouseKeeping -RunsToKeep 
         [string]$SMTPServer
         [string]$ReplyTo
         [string]$SyslogServer
+        [string]$LogPath
     }
     $Parameters = New-Object LdxLogParameters
     $Parameters.Tee=$Tee
@@ -218,6 +232,7 @@ $LogParams = New-LogFileParameters -Tee -DailyLogFile -HouseKeeping -RunsToKeep 
     $Parameters.SMTPServer = $SMTPServer
     $Parameters.ReplyTo = $ReplyTo
     $Parameters.SyslogServer = $SyslogServer
+    $Parameters.LogPath = $LogPath
 
     Return $Parameters
 }
@@ -267,6 +282,21 @@ Function New-DailyLogfileName {
     return (Join-Path -Path (Get-LogFileDirectory $WorkingDir) -ChildPath $LogfileName)
 }
 
+function  New-CustomDailyLogfileName  {
+    param (
+        [Parameter(Mandatory=$true)]
+        [string]
+        $LogPath,
+        [Parameter(Mandatory=$true)]
+        [string]
+        $BaseName
+    )
+    $LogfileName = $BaseName + "_" + (get-date -Format "yyyyMMdd") + ".log"
+    if (!(Test-Path -Path $LogPath)) {
+        New-Item -Path $LogPath -ItemType Directory -Force
+    }
+    return (Join-Path -Path $LogPath -ChildPath $LogfileName)
+}
 Function Get-LogFileDirectory {
     Param(
         [Parameter(Mandatory=$true)]
