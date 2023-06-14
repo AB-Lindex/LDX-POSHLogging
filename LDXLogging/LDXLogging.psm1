@@ -281,7 +281,44 @@ Function New-DailyLogfileName {
 
     return (Join-Path -Path (Get-LogFileDirectory $WorkingDir) -ChildPath $LogfileName)
 }
-
+Function New-DailyLogFileComputername {
+    <#
+    .Synopsis
+    Leif Almberg AB Lindex 4/11/2022
+    Lindex Powershell Module for Logging standardization
+    
+    .Description
+    
+    New-DailyLogFileComputername returns a logfile name based on:
+    The Computername
+    Current date
+    
+    The output can be used as a command-line argument to 'Write-Log' 
+    if you want to have a customized new logfile name.
+    
+    .Example
+    
+    #>
+    
+        $LogfileName = $ENV:COMPUTERNAME + "_" + (get-date -Format "yyyyMMdd") + ".log"
+    
+        return $LogfileName
+    }
+    
+    Function New-DailyLogfileName {
+        Param(
+            [Parameter(Mandatory=$true)]
+            [string]
+            $WorkingDir,
+            [Parameter(Mandatory=$true)]
+            [string]
+            $BaseName
+        )
+        $LogfileName = $BaseName + "_" + (get-date -Format "yyyyMMdd") + ".log"
+    
+        return (Join-Path -Path (Get-LogFileDirectory $WorkingDir) -ChildPath $LogfileName)
+    }
+    
 function  New-CustomDailyLogfileName  {
     param (
         [Parameter(Mandatory=$true)]
