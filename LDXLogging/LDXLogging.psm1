@@ -78,7 +78,10 @@ Write-Log -LogEntry "Entry 01" -LogFileParameters $LogParams -LogFile $LogFile
             $LogTodo = $true
             $LogEntryFormat = (Set-LogEntryFormat $LogEntry $Severity)
             $BaseName=(Get-Item $MyInvocation.ScriptName).BaseName
-        
+            if ($LogFileParameters.LogFile) {
+                $LogFile = $LogFileParameters.LogFile
+            }
+ 
             if (-not $LogFile) {
                 if ($LogFileParameters.DailyLogFile -or -not ($LogFileParameters)) {
                     if ( -not ($LogFileParameters.LogPath)) {
@@ -202,7 +205,10 @@ $LogParams = New-LogFileParameters -Tee -DailyLogFile -HouseKeeping -RunsToKeep 
         $SyslogServer,
         [Parameter(Mandatory=$false)]
         [string]
-        $LogPath
+        $LogPath,
+        [Parameter(Mandatory=$false)]
+        [string]
+        $LogFile
     )
     class LdxLogParameters {
         [bool]$tee
@@ -218,6 +224,7 @@ $LogParams = New-LogFileParameters -Tee -DailyLogFile -HouseKeeping -RunsToKeep 
         [string]$ReplyTo
         [string]$SyslogServer
         [string]$LogPath
+        [string]$LogFile
     }
     $Parameters = New-Object LdxLogParameters
     $Parameters.Tee=$Tee
@@ -233,6 +240,7 @@ $LogParams = New-LogFileParameters -Tee -DailyLogFile -HouseKeeping -RunsToKeep 
     $Parameters.ReplyTo = $ReplyTo
     $Parameters.SyslogServer = $SyslogServer
     $Parameters.LogPath = $LogPath
+    $Parameters.LogFile = $LogFile
 
     Return $Parameters
 }
