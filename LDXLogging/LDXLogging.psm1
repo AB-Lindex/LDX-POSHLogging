@@ -211,7 +211,7 @@ $LogParams = New-LogFileParameters -Tee -DailyLogFile -HouseKeeping -RunsToKeep 
         $LogFile
     )
     class LdxLogParameters {
-        [bool]$tee
+        [bool]$Tee
         [bool]$DailyLogFile
         [bool]$HouseKeeping
         [int]$DaysToKeep
