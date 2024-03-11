@@ -166,47 +166,47 @@ $LogParams = New-LogFileParameters -Tee -DailyLogFile -HouseKeeping -RunsToKeep 
 #>
 
     param(
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName = $true)]
         [switch]
         $Tee,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName = $true)]
         [switch]
         $DailyLogFile,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName = $true)]
         [switch]
         $HouseKeeping,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName = $true)]
         [int]
         $DaysToKeep,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName = $true)]
         [int]
         $RunsToKeep,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName = $true)]
         [int]
         $MegaBytesToKeep,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName = $true)]
         [switch]
         $Syslog,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName = $true)]
         [int]
         [ValidateRange(16,23)]
         $SyslogFacility,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName = $true)]
         [string]
         $AlertEmail,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName = $true)]
         [string]
         $SMTPServer,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName = $true)]
         [string]
         $ReplyTo,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName = $true)]
         [string]
         $SyslogServer,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName = $true)]
         [string]
         $LogPath,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName = $true)]
         [string]
         $LogFile
     )
