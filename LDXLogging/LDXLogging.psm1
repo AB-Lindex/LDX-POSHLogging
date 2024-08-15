@@ -473,7 +473,6 @@ Function Invoke-LogFileHouseKeeping {
         [Parameter(Mandatory=$false)]
         [switch]
         $List
-        
     )
 
     if (-not ($LogFilesFolder)) {
@@ -526,4 +525,48 @@ Function Invoke-LogFileHouseKeeping {
     } else {
         Write-Output "No LogFilesFolder as argument and not running from a script, nothing to do."
     }
+}
+
+function Send-AzEmail {
+    Param(
+        [Parameter(Mandatory=$false)]
+        [string]
+        $SMTPHost = 'smtp.azurecomm.net',
+        [Parameter(Mandatory=$false)]
+        [int]
+        $SMTPPort = 587,
+        [Parameter(Mandatory=$false)]
+        [bool]
+        $EnableSsl = $true,
+        [Parameter(Mandatory=$true)]
+        [string]
+        $From,
+        [Parameter(Mandatory=$true)]
+        [string]
+        $To,
+        [Parameter(Mandatory=$true)]
+        [string]
+        $Subject,
+        [Parameter(Mandatory=$true)]
+        [string]
+        $Body,
+        [parameter(Mandatory=$true)]
+        [pscredential]
+        $Credentials
+    )
+    
+    $smtp = new-object Net.Mail.SmtpClient
+    $smtp.Credentials = $Credentials
+    $smtp.EnableSsl = $EnableSsl
+    $smtp.host = $SMTPHost
+    $smtp.Port = $SMTPPort
+
+    $msg = new-object Net.Mail.MailMessage
+    $msg.Subject = $Subject
+    $msg.Body = $Body
+    $msg.From = $From
+    $msg.replyTo = $From
+    $msg.To.add($To)
+
+    $smtp.send($msg)
 }
