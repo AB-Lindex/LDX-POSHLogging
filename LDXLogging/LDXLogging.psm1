@@ -542,7 +542,7 @@ function Send-AzEmail {
         [string]
         $From,
         [Parameter(Mandatory=$true)]
-        [string]
+        [array]
         $To,
         [Parameter(Mandatory=$true)]
         [string]
@@ -566,7 +566,9 @@ function Send-AzEmail {
     $msg.Body = $Body
     $msg.From = $From
     $msg.replyTo = $From
-    $msg.To.add($To)
+    foreach($Receiver in $To) {
+        $msg.To.add($Receiver)
+    }
 
     $smtp.send($msg)
 }
