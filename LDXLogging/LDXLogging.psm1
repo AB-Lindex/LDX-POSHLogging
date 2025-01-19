@@ -90,7 +90,6 @@ Write-Log -LogEntry "Entry 01" -LogFileParameters $LogParams -LogFile $LogFile
                     } else {
                         $Logfile = (New-CustomDailyLogfileName $LogFileParameters.LogPath $BaseName)
                     }
-                    
                 }
             }
 
@@ -550,6 +549,9 @@ function Send-AzEmail {
         [Parameter(Mandatory=$true)]
         [string]
         $Body,
+        [Parameter(Mandatory=$false)]
+        [bool]
+        $IsBodyHTML = $false,
         [parameter(Mandatory=$true)]
         [pscredential]
         $Credentials
@@ -566,6 +568,7 @@ function Send-AzEmail {
     $msg.Body = $Body
     $msg.From = $From
     $msg.replyTo = $From
+    $msg.IsBodyHtml = $IsBodyHTML
     foreach($Receiver in $To) {
         $msg.To.add($Receiver)
     }
