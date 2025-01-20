@@ -6,7 +6,7 @@
 trigger: none
 
 pool:
-  name: AG-SH-01
+  name: ITTS01
 
 steps:
 - script: echo Hello, world!
