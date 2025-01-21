@@ -51,6 +51,16 @@ stages:
       displayName: "Commit updated version to repository"
       
     - task: PowerShell@2
+      displayName: "Install Nuget"
+      inputs:
+        targetType: inline
+        script: |
+          if (!(Get-PackageProvider | Where-Object {$_.Name -eq 'NuGet'})) {
+            Write-Host "Installing NuGet"
+            Install-PackageProvider -Name NuGet -Force 
+          }
+
+    - task: PowerShell@2
       displayName: 'Publish LDXLogging to PSGallery'
       inputs:
         targetType: 'inline'
