@@ -30,11 +30,12 @@ stages:
           # Increment version in .psd1
           $psd1Content = Import-PowerShellDataFile -Path $psd1Path
           $currentVersion = $psd1Content.ModuleVersion
+          Write-Host "Current version: $currentVersion"
           $newVersion = Increment-Version $currentVersion
           $psd1Content = Get-Content $psd1Path
           $psd1Content = $psd1Content -replace '(?<=ModuleVersion\s*=\s*'')[^'']+', $newVersion
           Set-Content $psd1Path $psd1Content
-          Write-Host "Updated .psd1 version: $newVersion"
+          Write-Host "Updated version: $newVersion"
 
           # Output the new version for use in subsequent steps
           Write-Output "##vso[task.setvariable variable=newVersion]$newVersion"
