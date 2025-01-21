@@ -51,10 +51,10 @@ stages:
     - script: |
         git config user.name "$(System.DefinitionName)"
         git config user.email "noreply@azure.com"
-        #git add "$(nuspecPath)"
-        #git add "$(psd1Path)"
-        #git commit -m "Incremented version to $(newVersion)"
-        #git push origin HEAD:$(Build.SourceBranchName)
+        git add "$(nuspecPath)"
+        git add "$(psd1Path)"
+        git commit -m "Incremented version to $(newVersion)"
+        git push origin HEAD:$(Build.SourceBranchName)
       displayName: "Commit updated versions to repository"
     - task: NuGetCommand@2
       displayName: "Pack NuGet package"
