@@ -67,10 +67,10 @@ stages:
       displayName: 'NuGet Add Source'
       inputs:
         command: custom
-        arguments: 'sources Add -Name "LDXPosh" -Source "https://www.powershellgallery.com/api/v2/package" -username "LDXModules" -password $(GithubPAT) -ConfigFile $(Build.SourcesDirectory)\nuget.config'
+        arguments: 'sources Add -Name "LDXPosh" -Source "https://api.nuget.org/v3/index.json" -username "LDXModules" -password $(GithubPAT) -ConfigFile $(Build.SourcesDirectory)\nuget.config'
 
     - task: NuGetCommand@2
       displayName: 'NuGet Push'
       inputs:
         command: custom
-        arguments: 'push $(Build.ArtifactStagingDirectory)\*.nupkg -Source ldxposh -apikey az -ConfigFile $(Build.SourcesDirectory)\nuget.config -Verbosity Detailed'
+        arguments: 'push $(Build.ArtifactStagingDirectory)\*.nupkg -Source LDXPosh -apikey az -ConfigFile $(Build.SourcesDirectory)\nuget.config -Verbosity Detailed'
