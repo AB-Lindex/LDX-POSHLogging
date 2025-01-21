@@ -27,9 +27,9 @@ stages:
               return "$($parts[0]).$($parts[1]).$($parts[2])"
           }
 
-
           # Increment version in .psd1
-          $currentVersion =  # psd path instead $nuspecXml.package.metadata.version
+          $psd1Content = Import-PowerShellDataFile -Path $psd1Path
+          $currentVersion = $psd1Content.ModuleVersion
           $newVersion = Increment-Version $currentVersion
           $psd1Content = Get-Content $psd1Path
           $psd1Content = $psd1Content -replace '(?<=ModuleVersion\s*=\s*'')[^'']+', $newVersion
