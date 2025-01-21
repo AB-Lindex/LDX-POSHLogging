@@ -56,7 +56,9 @@ stages:
         targetType: inline
         script: |
          if (-not (Get-Command Publish-Module -ErrorAction SilentlyContinue)) {
-            Install-Module -Name PowerShellGet -Force -Scope CurrentUser -AllowClobber
+           Install-Module -Name PowerShellGet -Force -Scope CurrentUser -AllowClobber
          }
+         Install-NuGetClientBinaries -Force
+
          Import-Module -Name PowerShellGet -Force
          publish-Module -Path "$(Build.SourcesDirectory)\LDXLogging" -Repository PSGallery -NuGetApiKey $(GithubPAT)
