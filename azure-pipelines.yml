@@ -63,9 +63,14 @@ stages:
         packagesToPack: '$(nuspecPath)'
         versioningScheme: 'off'
       
-    - task: PowerShell@2
-      displayName: 'Push Module to PSGallery'
+    - task: NuGetCommand@2
+      displayName: 'NuGet Add Source'
       inputs:
-        targetType: 'inline'
-        script: |
-          nuget.exe push "$(Build.ArtifactStagingDirectory)\YourModule.*.nupkg" -Source https://www.powershellgallery.com/api/v2/package -ApiKey $(GithubPAT)
+        command: custom
+        arguments: 'sources Add -Name "LDXPosh" -Source "https://www.powershellgallery.com/api/v2/package" -username "LDXModules" -password $(GithubPAT) -ConfigFile $(Build.SourcesDirectory)\nuget.config'
+
+    - task: NuGetCommand@2
+      displayName: 'NuGet Push'
+      inputs:
+        command: custom
+        arguments: 'push $(Build.ArtifactStagingDirectory)\*.nupkg -Source ldxposh -apikey az -ConfigFile $(Build.SourcesDirectory)\nuget.config -Verbosity Detailed'
