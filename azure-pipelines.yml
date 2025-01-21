@@ -68,5 +68,4 @@ stages:
       inputs:
         targetType: 'inline'
         script: |
-          $apiKey = "$(PSGalleryApiKey)"
           nuget.exe push "$(Build.ArtifactStagingDirectory)\YourModule.*.nupkg" -Source https://www.powershellgallery.com/api/v2/package -ApiKey $(GithubPAT)
