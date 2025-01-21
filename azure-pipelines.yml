@@ -14,7 +14,7 @@ stages:
 
     # Step 1: Increment the version number in .nuspec and .psd1
     - task: PowerShell@2
-      displayName: "Increment version in .psd1"
+      displayName: "Increment version in .nuspec and .psd1"
       inputs:
         targetType: inline
         script: |
@@ -55,5 +55,5 @@ stages:
         git add "$(psd1Path)"
         git commit -m "Incremented version to $(newVersion)"
         git push origin HEAD:$(Build.SourceBranchName)
-      displayName: "Commit updated version to repository"
+      displayName: "Commit updated versions to repository"
       
