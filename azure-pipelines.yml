@@ -18,6 +18,7 @@ stages:
       inputs:
         targetType: inline
         script: |
+          $nuspecPath = "$(Build.SourcesDirectory)\LDXLogging\LDXLogging.nuspec"
           $psd1Path = "$(Build.SourcesDirectory)\LDXLogging\LDXLogging.psd1"
 
           # Function to increment version
@@ -26,11 +27,15 @@ stages:
               $parts[2] = [int]$parts[2] + 1 # Increment the patch version
               return "$($parts[0]).$($parts[1]).$($parts[2])"
           }
+          # Increment version in .nuspec
+          [xml]$nuspecXml = Get-Content $nuspecPath
+          $currentVersion = $nuspecXml.package.metadata.version
+          $newVersion = Increment-Version $currentVersion
+          $nuspecXml.package.metadata.version = $newVersion
+          $nuspecXml.Save($nuspecPath)
+          Write-Host "Updated .nuspec version: $newVersion"
 
           # Increment version in .psd1
-          $psd1Content = Import-PowerShellDataFile -Path $psd1Path
-          $currentVersion = $psd1Content.ModuleVersion
-          Write-Host "Current version: $currentVersion"
           $newVersion = Increment-Version $currentVersion
           $psd1Content = Get-Content $psd1Path
           $psd1Content = $psd1Content -replace '(?<=ModuleVersion\s*=\s*'')[^'']+', $newVersion
@@ -39,15 +44,17 @@ stages:
 
           # Output the new version for use in subsequent steps
           Write-Output "##vso[task.setvariable variable=newVersion]$newVersion"
+          Write-Output "##vso[task.setvariable variable=nuspecPath]$nuspecPath"
           Write-Output "##vso[task.setvariable variable=psd1Path]$psd1Path"
 
     # Step 2: Commit the updated files back to the repository
     - script: |
         git config user.name "$(System.DefinitionName)"
         git config user.email "noreply@azure.com"
+        git add "$(nuspecPath)"
         git add "$(psd1Path)"
         git commit -m "Incremented version to $(newVersion)"
-#        git push origin HEAD:$(Build.SourceBranchName)
+        git push origin HEAD:$(Build.SourceBranchName)
       displayName: "Commit updated version to repository"
       
     - task: PowerShell@2
