@@ -47,5 +47,5 @@ stages:
         git config user.email "noreply@azure.com"
         git add "$(psd1Path)"
         git commit -m "Incremented version to $(newVersion)"
-        git push origin HEAD:$(Build.SourceBranchName)
+#        git push origin HEAD:$(Build.SourceBranchName)
       displayName: "Commit updated version to repository"
