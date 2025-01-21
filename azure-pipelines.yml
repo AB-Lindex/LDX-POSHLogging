@@ -1,18 +1,48 @@
-# Starter pipeline
-# Start with a minimal pipeline that you can customize to build and deploy your code.
-# Add steps that build, run tests, deploy, and more:
-# https://aka.ms/yaml
-
 trigger: none
 
-pool:
-  name: ITTS01
+stages:
+- stage: BuildAndVersion
+  pool:
+    name: ITTS01
+  displayName: Increment Version and Build
+  jobs:
+  - job: IncrementVersion
+    displayName: Increment Version, Build, Commit, Pack and Push
+    steps:
+    - checkout: self
+      persistCredentials: true
 
-steps:
-- script: echo Hello world!
-  displayName: 'Run a one-line script'
+    # Step 1: Increment the version number in .nuspec and .psd1
+    - task: PowerShell@2
+      displayName: "Increment version in .psd1"
+      inputs:
+        targetType: inline
+        script: |
+          $psd1Path = "$(Build.SourcesDirectory)\LDXLogging\LDXLogging.psd1"
 
-- script: |
-    echo Add other tasks to build, test, and deploy your project.
-    echo See https://aka.ms/yaml
-  displayName: 'Run a multi-line script'
+          # Function to increment version
+          function Increment-Version($version) {
+              $parts = $version -split '\.'
+              $parts[2] = [int]$parts[2] + 1 # Increment the patch version
+              return "$($parts[0]).$($parts[1]).$($parts[2])"
+          }
+
+
+          # Increment version in .psd1
+          $psd1Content = Get-Content $psd1Path
+          $psd1Content = $psd1Content -replace '(?<=ModuleVersion\s*=\s*'')[^'']+', $newVersion
+          Set-Content $psd1Path $psd1Content
+          Write-Host "Updated .psd1 version: $newVersion"
+
+          # Output the new version for use in subsequent steps
+          Write-Output "##vso[task.setvariable variable=newVersion]$newVersion"
+          Write-Output "##vso[task.setvariable variable=psd1Path]$psd1Path"
+
+    # Step 2: Commit the updated files back to the repository
+    - script: |
+        git config user.name "$(System.DefinitionName)"
+        git config user.email "noreply@azure.com"
+        git add "$(psd1Path)"
+        git commit -m "Incremented version to $(newVersion)"
+        git push origin HEAD:$(Build.SourceBranchName)
+      displayName: "Commit updated version to repository"
