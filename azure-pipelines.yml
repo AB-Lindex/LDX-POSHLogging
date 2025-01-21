@@ -57,15 +57,3 @@ stages:
         git push origin HEAD:$(Build.SourceBranchName)
       displayName: "Commit updated version to repository"
       
-    - task: PowerShell@2
-      displayName: 'Publish LDXLogging to PSGallery'
-      inputs:
-        targetType: inline
-        script: |
-         if (-not (Get-Command Publish-Module -ErrorAction SilentlyContinue)) {
-           Install-Module -Name PowerShellGet -Force -Scope CurrentUser -AllowClobber
-         }
-         # Install-NuGetClientBinaries -Force
-
-         Import-Module -Name PowerShellGet -Force
-         publish-Module -Path "$(Build.SourcesDirectory)\LDXLogging" -Repository PSGallery -NuGetApiKey $(GithubPAT)
