@@ -29,6 +29,8 @@ stages:
 
 
           # Increment version in .psd1
+          $currentVersion =  # psd path instead $nuspecXml.package.metadata.version
+          $newVersion = Increment-Version $currentVersion
           $psd1Content = Get-Content $psd1Path
           $psd1Content = $psd1Content -replace '(?<=ModuleVersion\s*=\s*'')[^'']+', $newVersion
           Set-Content $psd1Path $psd1Content
@@ -44,5 +46,5 @@ stages:
         git config user.email "noreply@azure.com"
         git add "$(psd1Path)"
         git commit -m "Incremented version to $(newVersion)"
-        git push origin HEAD:$(Build.SourceBranchName)
+#        git push origin HEAD:$(Build.SourceBranchName)
       displayName: "Commit updated version to repository"
