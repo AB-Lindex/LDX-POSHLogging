@@ -4,10 +4,10 @@ stages:
 - stage: BuildAndVersion
   pool:
     name: ITTS01
-  displayName: Increment Version and Build
+  displayName: Increment Version and Publish
   jobs:
   - job: IncrementVersion
-    displayName: Increment Version, Build, Commit, Pack and Push
+    displayName: Increment Version, Commit and Publish
     steps:
     - checkout: self
       persistCredentials: true
