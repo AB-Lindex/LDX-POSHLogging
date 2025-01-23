@@ -53,22 +53,10 @@ stages:
         git commit -m "Incremented version to $(newVersion)"
         git push origin HEAD:$(Build.SourceBranchName)
       displayName: "Commit updated version to repository"
-      
-    - task: NuGetCommand@2
-      displayName: "Pack NuGet package"
-      inputs:
-        command: 'pack'
-        packagesToPack: '$(nuspecPath)'
-        versioningScheme: 'off'
-    - task: NuGetCommand@2
-      displayName: 'NuGet Add Source'
-      inputs:
-        command: custom
-        arguments: 'sources Add -Name "NuGetGallery" -Source "https://api.nuget.org/v3/index.json" -username "leialm" -password $(NugetPAT) -ConfigFile $(Build.SourcesDirectory)\nuget.config'
 
-    - task: NuGetCommand@2
-      displayName: 'NuGet Push'
+    - task: PowerShell@2
+      displayName: 'Publish LDXLogging to PSGallery'
       inputs:
-        command: custom
-        arguments: 'push $(Build.ArtifactStagingDirectory)\*.nupkg -Source NuGetGallery -apikey az -ConfigFile $(Build.SourcesDirectory)\nuget.config -Verbosity Detailed'
-
+        targetType: 'inline'
+        script: 'publish-Module -Path "$(Build.SourcesDirectory)\LDXLogging" -Repository PSGallery -NuGetApiKey $(GithubPAT)'
+        pwsh: true
