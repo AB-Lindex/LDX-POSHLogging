@@ -1,8 +1,8 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <package>
   <metadata>
     <id>LDXLogging</id>
-    <version>0.99.96</version>
+    <version>0.99.97</version>
     <authors>Leif Almberg Niklas Goude</authors>
     <owners>AB Lindex</owners>
     <requireLicenseAcceptance>false</requireLicenseAcceptance>
