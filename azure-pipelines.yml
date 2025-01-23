@@ -65,3 +65,15 @@ stages:
         command: 'pack'
         packagesToPack: '$(nuspecPath)'
         versioningScheme: 'off'
+    - task: NuGetCommand@2
+      displayName: 'NuGet Add Source'
+      inputs:
+        command: custom
+        arguments: 'sources Add -Name "PSGallery" -Source "https://pkgs.dev.azure.com/Lindex/54d6313b-d328-4646-9f0e-8b8d5b9aa9ae/_packaging/LdxPoshFeed/nuget/v3/index.json" -username "LDXModules" -password $(GithubPAT) -ConfigFile $(Build.SourcesDirectory)\nuget.config'
+
+    - task: NuGetCommand@2
+      displayName: 'NuGet Push'
+      inputs:
+        command: custom
+        arguments: 'push $(Build.ArtifactStagingDirectory)\*.nupkg -Source PSGallery -apikey az -ConfigFile $(Build.SourcesDirectory)\nuget.config -Verbosity Detailed'
+
