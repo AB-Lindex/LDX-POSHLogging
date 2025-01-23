@@ -44,11 +44,6 @@ stages:
           Write-Output "##vso[task.setvariable variable=nuspecPath]$nuspecPath"
           Write-Output "##vso[task.setvariable variable=psd1Path]$psd1Path"
 
-          # Output the new version for use in subsequent steps
-          Write-Output "##vso[task.setvariable variable=newVersion]$newVersion"
-          Write-Output "##vso[task.setvariable variable=nuspecPath]$nuspecPath"
-          Write-Output "##vso[task.setvariable variable=psd1Path]$psd1Path"
-
     # Step 2: Commit the updated files back to the repository
     - script: |
         git config user.name "$(System.DefinitionName)"
