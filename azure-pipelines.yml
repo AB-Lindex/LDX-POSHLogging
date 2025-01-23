@@ -69,7 +69,7 @@ stages:
       displayName: 'NuGet Add Source'
       inputs:
         command: custom
-        arguments: 'sources Add -Name "NuGetGallery" -Source "https://api.nuget.org/v3/index.json" -username "LDXModules" -password $(GithubPAT) -ConfigFile $(Build.SourcesDirectory)\nuget.config'
+        arguments: 'sources Add -Name "NuGetGallery" -Source "https://api.nuget.org/v3/index.json" -username "LDXModules" -password $(NugetPAT) -ConfigFile $(Build.SourcesDirectory)\nuget.config'
 
     - task: NuGetCommand@2
       displayName: 'NuGet Push'
