@@ -36,6 +36,8 @@ stages:
           $psd1Content = $psd1Content -replace '(?<=ModuleVersion\s*=\s*'')[^'']+', $newVersion
           Set-Content $psd1Path $psd1Content
           Write-Host "Updated version: $newVersion"
+          Write-Output "##vso[task.setvariable variable=newVersion]$newVersion"
+          Write-Output "##vso[task.setvariable variable=psd1Path]$psd1Path"
 
     # Step 2: Commit the updated files back to the repository
     - script: |
