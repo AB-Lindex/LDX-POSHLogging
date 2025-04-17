@@ -57,5 +57,5 @@ stages:
       displayName: 'Publish LDXLogging to PSGallery'
       inputs:
         targetType: 'inline'
-        script: 'publish-Module -Path "$(Build.SourcesDirectory)\LDXLogging" -Repository PSGallery -NuGetApiKey $(GithubPAT) -Force -Confirm:$false'
+        script: 'publish-Module -Path "$(Build.SourcesDirectory)\LDXLogging" -Repository PSGallery -NuGetApiKey $(PSGallery) -Force -Confirm:$false'
         pwsh: true
