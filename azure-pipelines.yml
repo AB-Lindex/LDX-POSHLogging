@@ -47,15 +47,9 @@ stages:
         git commit -m "Incremented version to $(newVersion)"
         git push origin HEAD:$(Build.SourceBranchName)
       displayName: "Commit updated version to repository"
-    - task: AzureKeyVault@2
-      inputs:
-        azureSubscription: 'TS Lab(8e969b2c-9ba0-469e-ad78-e02848506dc5)'
-        KeyVaultName: 'LA-Dev-kv'
-        SecretsFilter: 'PSGallery'
-        RunAsPreJob: false
     - task: PowerShell@2
       displayName: 'Publish LDXLogging to PSGallery'
       inputs:
         targetType: 'inline'
-        script: 'publish-Module -Path "$(Build.SourcesDirectory)\LDXLogging" -Repository PSGallery -NuGetApiKey $(PSGallery) -Force -Confirm:$false'
+        script: 'publish-Module -Path "$(Build.SourcesDirectory)\LDXLogging" -Repository PSGallery -NuGetApiKey $(GithubPAT) -Force -Confirm:$false'
         pwsh: true
