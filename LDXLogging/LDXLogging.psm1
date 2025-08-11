@@ -114,7 +114,7 @@ Write-Log -LogEntry "Entry 01" -LogFileParameters $LogParams -LogFile $LogFile
 
     if ($LogFileParameters.HouseKeeping) {
         $HouseKeepingTodo = $true
-        Invoke-LogFileHouseKeeping -DaysToKeep $LogFileParameters.DaysToKeep -RunsToKeep $LogFileParameters.RunsToKeep
+        Invoke-LogFileHouseKeeping -DaysToKeep $LogFileParameters.DaysToKeep -RunsToKeep $LogFileParameters.RunsToKeep -LogFilesFolder (Split-Path $LogFile -Parent)
     }
     if (!($LogTodo) -and !($HouseKeepingTodo)) {
         write-output "Nothing to log, use get-help write-log for parameters."
