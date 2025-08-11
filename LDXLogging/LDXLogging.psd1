@@ -2,7 +2,7 @@
 
 RootModule = 'LDXLogging.psm1'
 
-ModuleVersion = '0.99.109'
+ModuleVersion = '0.99.110'
 
 GUID = '1690488f-9000-46f9-874f-8fe2ddaaab61'
 
