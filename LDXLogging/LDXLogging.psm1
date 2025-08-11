@@ -484,8 +484,6 @@ Function Invoke-LogFileHouseKeeping {
     } else {
         $LogFileDirectory = $LogFilesFolder
     }
-        Write-Output "dir: $logfiledirectory"
-        Write-Output "keep: $DaysToKeep"
     if ($LogFileDirectory) {
         if ($DaysToKeep) {
             foreach ($file in Get-ChildItem -Path $LogFileDirectory -File -Recurse:$Recurse) { 
