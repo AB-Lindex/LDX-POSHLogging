@@ -52,18 +52,18 @@ Write-Log -LogEntry "Entry 01" -LogFileParameters $LogParams -LogFile $LogFile
 #>
 
     Param(
-        [Parameter(Mandatory=$false,
-        ValueFromPipeline=$true)]
+        [Parameter(Mandatory = $false,
+        ValueFromPipeline = $true)]
         [string]
         $LogEntry,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [string]
         $LogFile,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [string]
         [ValidateSet("Emergency","Alert","Critical","Error","Warning","Notice","Info","Debug")]
         $Severity = "info",
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [object]
         $LogFileParameters
     )
@@ -76,7 +76,7 @@ Write-Log -LogEntry "Entry 01" -LogFileParameters $LogParams -LogFile $LogFile
             Write-Output "This command has to run from a script, not from the command line"
         } else {
             $LogTodo = $true
-            $LogEntryFormat = (Set-LogEntryFormat $LogEntry $Severity)
+            $LogEntryFormatted = (Set-LogEntryFormat -LogEntry $LogEntry -Severity $Severity)
             $BaseName=(Get-Item $MyInvocation.ScriptName).BaseName
             if ($LogFileParameters.LogFile) {
                 $LogFile = $LogFileParameters.LogFile
@@ -85,29 +85,29 @@ Write-Log -LogEntry "Entry 01" -LogFileParameters $LogParams -LogFile $LogFile
             if (-not $LogFile) {
                 if ($LogFileParameters.DailyLogFile -or -not ($LogFileParameters)) {
                     if ( -not ($LogFileParameters.LogPath)) {
-                        $WorkingDir=(Split-Path -Parent $MyInvocation.ScriptName)
-                        $Logfile = (New-DailyLogfileName $WorkingDir $BaseName)
+                        $WorkingDir = (Split-Path -Parent $MyInvocation.ScriptName)
+                        $Logfile = (New-DailyLogfileName -WorkingDir $WorkingDir -BaseName $BaseName)
                     } else {
-                        $Logfile = (New-CustomDailyLogfileName $LogFileParameters.LogPath $BaseName)
+                        $Logfile = (New-CustomDailyLogfileName -LogPath $LogFileParameters.LogPath -BaseName $BaseName)
                     }
                 }
             }
 
             if ($Logfile) {
-                Write-LogEntryLogFile $LogEntryFormat $Logfile
+                Write-LogEntryLogFile -LogEntry $LogEntryFormatted -LogFile $Logfile
             }
 
             if ($LogFileParameters.Tee -or -not ($LogFileParameters)) {
-                Write-Tee $LogEntryFormat
+                Write-Tee -LogEntry $LogEntryFormatted
             }
 
             if ($LogFileParameters.Syslog -and $LogFileParameters.SyslogServer) {
-                Write-SyslogEntry $LogEntry $LogFileParameters.SyslogFacility $Severity $LogFileParameters.SyslogServer
+                Write-SyslogEntry -LogEntry $LogEntry -SyslogFacility $LogFileParameters.SyslogFacility -Severity $Severity -SyslogServer $LogFileParameters.SyslogServer
             }
 
             if ($LogFileParameters.AlertEmail -and $Severity -eq 'Critical') {
-                $Subject=$MyInvocation.Scriptname + " encountered an error"
-                Send-Email $Subject $LogEntryFormat $LogFileParameters.AlertEmail $LogFileParameters.SMTPServer $LogFileParameters.ReplyTo
+                $Subject = $MyInvocation.Scriptname + " encountered an error"
+                Send-Email -Subject $Subject -Body $LogEntryFormatted -EmailReceiver $LogFileParameters.AlertEmail -SMTPServer $LogFileParameters.SMTPServer -ReplyTo $LogFileParameters.ReplyTo
             }
         }
     } 
@@ -165,47 +165,47 @@ $LogParams = New-LogFileParameters -Tee -DailyLogFile -HouseKeeping -RunsToKeep 
 #>
 
     param(
-        [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName = $true)]
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $true)]
         [switch]
         $Tee,
-        [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName = $true)]
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $true)]
         [switch]
         $DailyLogFile,
-        [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName = $true)]
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $true)]
         [switch]
         $HouseKeeping,
-        [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName = $true)]
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $true)]
         [int]
         $DaysToKeep,
-        [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName = $true)]
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $true)]
         [int]
         $RunsToKeep,
-        [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName = $true)]
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $true)]
         [int]
         $MegaBytesToKeep,
-        [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName = $true)]
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $true)]
         [switch]
         $Syslog,
-        [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName = $true)]
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $true)]
         [int]
         [ValidateRange(16,23)]
         $SyslogFacility,
-        [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName = $true)]
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $true)]
         [string]
         $AlertEmail,
-        [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName = $true)]
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $true)]
         [string]
         $SMTPServer,
-        [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName = $true)]
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $true)]
         [string]
         $ReplyTo,
-        [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName = $true)]
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $true)]
         [string]
         $SyslogServer,
-        [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName = $true)]
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $true)]
         [string]
         $LogPath,
-        [Parameter(Mandatory=$false, ValueFromPipelineByPropertyName = $true)]
+        [Parameter(Mandatory = $false, ValueFromPipelineByPropertyName = $true)]
         [string]
         $LogFile
     )
@@ -226,15 +226,15 @@ $LogParams = New-LogFileParameters -Tee -DailyLogFile -HouseKeeping -RunsToKeep 
         [string]$LogFile
     }
     $Parameters = New-Object LdxLogParameters
-    $Parameters.Tee=$Tee
-    $Parameters.DailyLogFile=$DailyLogFile
-    $Parameters.HouseKeeping=$HouseKeeping
-    $Parameters.DaysToKeep=$DaysToKeep
-    $Parameters.RunsToKeep=$RunsToKeep
-    $Parameters.MegaBytesToKeep=$MegaBytesToKeep
-    $Parameters.Syslog=$Syslog
-    $Parameters.SyslogFacility=$SyslogFacility
-    $Parameters.AlertEmail=$AlertEmail
+    $Parameters.Tee = $Tee
+    $Parameters.DailyLogFile = $DailyLogFile
+    $Parameters.HouseKeeping = $HouseKeeping
+    $Parameters.DaysToKeep = $DaysToKeep
+    $Parameters.RunsToKeep = $RunsToKeep
+    $Parameters.MegaBytesToKeep = $MegaBytesToKeep
+    $Parameters.Syslog = $Syslog
+    $Parameters.SyslogFacility = $SyslogFacility
+    $Parameters.AlertEmail = $AlertEmail
     $Parameters.SMTPServer = $SMTPServer
     $Parameters.ReplyTo = $ReplyTo
     $Parameters.SyslogServer = $SyslogServer
@@ -272,21 +272,21 @@ C:\Script\logfiles\Action_20200331-142031.log
     $BaseName=(Get-Item $MyInvocation.ScriptName).BaseName
     $LogfileName = $BaseName + "_" + (get-date -Format "yyyyMMdd-HHmmss") + ".log"
 
-    return (Join-Path -Path (Get-LogFileDirectory $WorkingDir) -ChildPath $LogfileName)
+    return (Join-Path -Path (Get-LogFilesFolder $WorkingDir) -ChildPath $LogfileName)
 }
 
 Function New-DailyLogfileName {
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $WorkingDir,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $BaseName
     )
     $LogfileName = $BaseName + "_" + (get-date -Format "yyyyMMdd") + ".log"
 
-    return (Join-Path -Path (Get-LogFileDirectory $WorkingDir) -ChildPath $LogfileName)
+    return (Join-Path -Path (Get-LogFilesFolder $WorkingDir) -ChildPath $LogfileName)
 }
 Function New-DailyLogFileComputername {
     <#
@@ -314,24 +314,24 @@ Function New-DailyLogFileComputername {
     
     Function New-DailyLogfileName {
         Param(
-            [Parameter(Mandatory=$true)]
+            [Parameter(Mandatory = $true)]
             [string]
             $WorkingDir,
-            [Parameter(Mandatory=$true)]
+            [Parameter(Mandatory = $true)]
             [string]
             $BaseName
         )
         $LogfileName = $BaseName + "_" + (get-date -Format "yyyyMMdd") + ".log"
     
-        return (Join-Path -Path (Get-LogFileDirectory $WorkingDir) -ChildPath $LogfileName)
+        return (Join-Path -Path (Get-LogFilesFolder $WorkingDir) -ChildPath $LogfileName)
     }
     
 function  New-CustomDailyLogfileName  {
     param (
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $LogPath,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $BaseName
     )
@@ -341,33 +341,33 @@ function  New-CustomDailyLogfileName  {
     }
     return (Join-Path -Path $LogPath -ChildPath $LogfileName)
 }
-Function Get-LogFileDirectory {
+Function Get-LogFilesFolder {
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $WorkingDir
     )
-    $LogFileDirectory=(Join-Path -Path $WorkingDir -ChildPath "logfiles")
-    if (!(test-path -path $LogFileDirectory)) {
-        New-Item -ItemType Directory -Path $LogFileDirectory | Out-Null
+    $LogFilesFolder=(Join-Path -Path $WorkingDir -ChildPath "logfiles")
+    if (!(test-path -path $LogFilesFolder)) {
+        New-Item -ItemType Directory -Path $LogFilesFolder | Out-Null
     }
 
-    return $LogFileDirectory
+    return $LogFilesFolder
 }
 
 function Write-SyslogEntry {
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $LogEntry,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [int]
         [ValidateRange(16,23)]
         $SyslogFacility,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [string]
         $Severity="Info",
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $SyslogServer
     )
@@ -388,10 +388,10 @@ function Write-SyslogEntry {
 
 function Write-LogEntryLogFile {
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $LogEntry,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $LogFile
     )
@@ -401,19 +401,19 @@ function Write-LogEntryLogFile {
 
 function Send-Email {
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $Subject,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $Body,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $EmailReceiver,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $SMTPServer,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $ReplyTo
     )
@@ -431,7 +431,7 @@ function Send-Email {
 
 function Write-Tee {
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $LogEntry
     )
@@ -441,10 +441,10 @@ function Write-Tee {
 
 function Set-LogEntryFormat {
     Param(
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $LogEntry,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [string]
         $Severity
     )
@@ -454,105 +454,91 @@ function Set-LogEntryFormat {
 
 Function Invoke-LogFileHouseKeeping {
     Param(
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $true)]
         [string]
         $LogFilesFolder,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [switch]
         $Recurse,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [int]
         $DaysToKeep,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [int]
         $RunsToKeep,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [int]
         $MegaBytesToKeep,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [switch]
         $List
     )
 
-    if (-not ($LogFilesFolder)) {
-        if ( -not ($MyInvocation.ScriptName)) {
-            Write-Output "Without LogFilesFolder as an argument, this command has to run from a script, not from the command line"
-        } else {
-            $WorkingDir=(Split-Path -Parent $MyInvocation.ScriptName)
-            $LogFileDirectory=(Get-LogFileDirectory $WorkingDir)
-        }
-    } else {
-        $LogFileDirectory = $LogFilesFolder
-    }
-    if ($LogFileDirectory) {
-        if ($DaysToKeep) {
-            foreach ($file in Get-ChildItem -Path $LogFileDirectory -File -Recurse:$Recurse) { 
-                if ($file.lastwritetime -le (get-date).AddDays(-$DaysToKeep)) {
-                    if ($List) {
-                        $file
-                    } else {
-                        remove-item -path (Join-Path -Path $file.Directory -ChildPath $file) -Force 
-                    }
-                } 
-            }
-        }
-
-        if ($RunsToKeep) {
-            $files = (Get-ChildItem -Path $LogFileDirectory -Recurse:$Recurse | Sort-Object LastWriteTime | Select-Object -first ((Get-ChildItem -Path $LogFileDirectory | Measure-Object).count -$RunsToKeep))
-            if ($List) {
-                $files
-            } else {
-                $files | remove-item -Force
-            }
-        }
-
-        if ($MegaBytesToKeep) {
-            $ActualMegaBytesToKeep = $MegaBytesToKeep * 1024 * 1024
-            $files = Get-ChildItem -Path $LogFileDirectory -Recurse:$false | Sort-Object LastWriteTime
-            $sum = (($files | Measure-Object -Sum Length).Sum)
-            $n=0
-            while (($sum -gt $ActualMegaBytesToKeep) -or ($n -gt $files.count)) {
-                $sum = $sum - $files[$n].Length
+    if ($DaysToKeep) {
+        foreach ($file in Get-ChildItem -Path $LogFilesFolder -File -Recurse:$Recurse) { 
+            if ($file.lastwritetime -le (get-date).AddDays(-$DaysToKeep)) {
                 if ($List) {
-                    $files[$n]
+                    $file
                 } else {
-                    $files[$n] | remove-item -Force
+                    remove-item -path (Join-Path -Path $file.Directory -ChildPath $file) -Force 
                 }
-                $n++
-            }
+            } 
         }
-    } else {
-        Write-Output "No LogFilesFolder as argument and not running from a script, nothing to do."
+    }
+
+    if ($RunsToKeep) {
+        $files = (Get-ChildItem -Path $LogFilesFolder -Recurse:$Recurse | Sort-Object LastWriteTime | Select-Object -first ((Get-ChildItem -Path $LogFilesFolder | Measure-Object).count -$RunsToKeep))
+        if ($List) {
+            $files
+        } else {
+            $files | remove-item -Force
+        }
+    }
+
+    if ($MegaBytesToKeep) {
+        $ActualMegaBytesToKeep = $MegaBytesToKeep * 1024 * 1024
+        $files = Get-ChildItem -Path $LogFilesFolder -Recurse:$false | Sort-Object LastWriteTime
+        $sum = (($files | Measure-Object -Sum Length).Sum)
+        $n=0
+        while (($sum -gt $ActualMegaBytesToKeep) -or ($n -gt $files.count)) {
+            $sum = $sum - $files[$n].Length
+            if ($List) {
+                $files[$n]
+            } else {
+                $files[$n] | remove-item -Force
+            }
+            $n++
+        }
     }
 }
 
 function Send-AzEmail {
     Param(
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [string]
         $SMTPHost = 'smtp.azurecomm.net',
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [int]
         $SMTPPort = 587,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [bool]
         $EnableSsl = $true,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $From,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [array]
         $To,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $Subject,
-        [Parameter(Mandatory=$true)]
+        [Parameter(Mandatory = $true)]
         [string]
         $Body,
-        [Parameter(Mandatory=$false)]
+        [Parameter(Mandatory = $false)]
         [bool]
         $IsBodyHTML = $false,
-        [parameter(Mandatory=$true)]
+        [parameter(Mandatory = $true)]
         [pscredential]
         $Credentials
     )
