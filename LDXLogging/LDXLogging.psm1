@@ -70,22 +70,22 @@ Write-Log -LogEntry "Entry 01" -LogFileParameters $LogParams -LogFile $LogFile
 
     [bool]$LogTodo = $false
     [bool]$HouseKeepingTodo = $false
-
+    $ScriptName = $MyInvocation.ScriptName
     if ($LogEntry) { 
-         if ( -not ($MyInvocation.ScriptName)) {
+         if (!$ScriptName) {
             Write-Output "This command has to run from a script, not from the command line"
         } else {
             $LogTodo = $true
             $LogEntryFormatted = (Set-LogEntryFormat -LogEntry $LogEntry -Severity $Severity)
-            $BaseName=(Get-Item $MyInvocation.ScriptName).BaseName
+            $BaseName=(Get-Item $ScriptName).BaseName
             if ($LogFileParameters.LogFile) {
                 $LogFile = $LogFileParameters.LogFile
             }
  
-            if (-not $LogFile) {
-                if ($LogFileParameters.DailyLogFile -or -not ($LogFileParameters)) {
-                    if ( -not ($LogFileParameters.LogPath)) {
-                        $WorkingDir = (Split-Path -Parent $MyInvocation.ScriptName)
+            if (!$LogFile) {
+                if ($LogFileParameters.DailyLogFile -or !$LogFileParameters) {
+                    if (!$LogFileParameters.LogPath) {
+                        $WorkingDir = (Split-Path -Parent $ScriptName)
                         $Logfile = (New-DailyLogfileName -WorkingDir $WorkingDir -BaseName $BaseName)
                     } else {
                         $Logfile = (New-CustomDailyLogfileName -LogPath $LogFileParameters.LogPath -BaseName $BaseName)
@@ -97,7 +97,7 @@ Write-Log -LogEntry "Entry 01" -LogFileParameters $LogParams -LogFile $LogFile
                 Write-LogEntryLogFile -LogEntry $LogEntryFormatted -LogFile $Logfile
             }
 
-            if ($LogFileParameters.Tee -or -not ($LogFileParameters)) {
+            if ($LogFileParameters.Tee -or !$LogFileParameters) {
                 Write-Tee -LogEntry $LogEntryFormatted
             }
 
@@ -116,7 +116,7 @@ Write-Log -LogEntry "Entry 01" -LogFileParameters $LogParams -LogFile $LogFile
         $HouseKeepingTodo = $true
         Invoke-LogFileHouseKeeping -DaysToKeep $LogFileParameters.DaysToKeep -RunsToKeep $LogFileParameters.RunsToKeep -LogFilesFolder (Split-Path $LogFile -Parent)
     }
-    if (!($LogTodo) -and !($HouseKeepingTodo)) {
+    if (!$LogTodo -and !$HouseKeepingTodo) {
         write-output "Nothing to log, use get-help write-log for parameters."
     }
 }
@@ -267,11 +267,10 @@ The output of 'New-LogFileCurrentRunName' will be:
 C:\Script\logfiles\Action_20200331-142031.log
 
 #>
-
-    $WorkingDir=(Split-Path -Parent $MyInvocation.ScriptName)
-    $BaseName=(Get-Item $MyInvocation.ScriptName).BaseName
+    $ScriptName = $MyInvocation.ScriptName
+    $WorkingDir=(Split-Path -Parent $ScriptName)
+    $BaseName=(Get-Item $ScriptName).BaseName
     $LogfileName = $BaseName + "_" + (get-date -Format "yyyyMMdd-HHmmss") + ".log"
-
     return (Join-Path -Path (Get-LogFilesFolder $WorkingDir) -ChildPath $LogfileName)
 }
 
@@ -306,9 +305,7 @@ Function New-DailyLogFileComputername {
     .Example
     
     #>
-    
         $LogfileName = $ENV:COMPUTERNAME + "_" + (get-date -Format "yyyyMMdd") + ".log"
-    
         return $LogfileName
     }
     
@@ -322,7 +319,6 @@ Function New-DailyLogFileComputername {
             $BaseName
         )
         $LogfileName = $BaseName + "_" + (get-date -Format "yyyyMMdd") + ".log"
-    
         return (Join-Path -Path (Get-LogFilesFolder $WorkingDir) -ChildPath $LogfileName)
     }
     
@@ -351,7 +347,6 @@ Function Get-LogFilesFolder {
     if (!(test-path -path $LogFilesFolder)) {
         New-Item -ItemType Directory -Path $LogFilesFolder | Out-Null
     }
-
     return $LogFilesFolder
 }
 
@@ -383,7 +378,6 @@ function Write-SyslogEntry {
     $UDPCLient = New-Object System.Net.Sockets.UdpClient
     $UDPCLient.Connect($SyslogServer, '514')
     $UDPCLient.Send($RawMsg, $rawmsg.Length) | Out-Null
-
 }
 
 function Write-LogEntryLogFile {
@@ -395,7 +389,6 @@ function Write-LogEntryLogFile {
         [string]
         $LogFile
     )
-
     $LogEntry | Out-File -FilePath $LogFile -Append -Force
 }
 
@@ -435,7 +428,6 @@ function Write-Tee {
         [string]
         $LogEntry
     )
-
     Write-Output $LogEntry
 }
 
@@ -473,16 +465,12 @@ Function Invoke-LogFileHouseKeeping {
         [switch]
         $List
     )
-
     if ($DaysToKeep) {
-        foreach ($file in Get-ChildItem -Path $LogFilesFolder -File -Recurse:$Recurse) { 
-            if ($file.lastwritetime -le (get-date).AddDays(-$DaysToKeep)) {
-                if ($List) {
-                    $file
-                } else {
-                    remove-item -path (Join-Path -Path $file.Directory -ChildPath $file) -Force 
-                }
-            } 
+        $files = Get-ChildItem -Path $LogFilesFolder -File -Recurse:$Recurse | Where-Object {$_.lastwritetime -le (get-date).AddDays(-$DaysToKeep)} 
+        if ($List) {
+            $files
+        } else {
+            $files | remove-item -Force
         }
     }
 
