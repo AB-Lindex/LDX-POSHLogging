@@ -6,7 +6,7 @@ ModuleVersion = '0.99.113'
 
 GUID = '1690488f-9000-46f9-874f-8fe2ddaaab61'
 
-Author = 'Leif Almberg, Niklas Goude'
+Author = 'Leif Almberg'
 
 CompanyName = 'AB Lindex'
 
@@ -16,7 +16,7 @@ Description = 'AB Lindex Log Module'
 
 NestedModules = 'LDXLogging.psm1'
 
-FunctionsToExport = 'Write-Log','New-LogFileParameters','New-LogFileCurrentRunName','Invoke-LogFileHouseKeeping','New-DailyLogFileComputername','Send-AzEmail'
+FunctionsToExport = 'Write-Log','New-LogFileParameters','New-LogFileCurrentRunName','Invoke-LogFileHouseKeeping','New-DailyLogFileComputername','Send-AzEmail','Get-CurrentDailyLogfile'
 
 CmdletsToExport = @()
 

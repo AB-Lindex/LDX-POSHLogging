@@ -273,7 +273,12 @@ C:\Script\logfiles\Action_20200331-142031.log
     $LogfileName = $BaseName + "_" + (get-date -Format "yyyyMMdd-HHmmss") + ".log"
     return (Join-Path -Path (Get-LogFilesFolder $WorkingDir) -ChildPath $LogfileName)
 }
+function Get-CurrentDailyLogfile {
+    $WorkingDir = (Split-Path -Parent $ScriptName)
+    $BaseName=(Get-Item $ScriptName).BaseName
 
+    return New-DailyLogfileName -WorkingDir $WorkingDir -BaseName $BaseName    
+}
 Function New-DailyLogfileName {
     Param(
         [Parameter(Mandatory = $true)]
