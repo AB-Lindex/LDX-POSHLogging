@@ -274,6 +274,7 @@ C:\Script\logfiles\Action_20200331-142031.log
     return (Join-Path -Path (Get-LogFilesFolder $WorkingDir) -ChildPath $LogfileName)
 }
 function Get-CurrentDailyLogfile {
+    $ScriptName = $MyInvocation.ScriptName
     $WorkingDir = (Split-Path -Parent $ScriptName)
     $BaseName=(Get-Item $ScriptName).BaseName
 
@@ -313,20 +314,6 @@ Function New-DailyLogFileComputername {
         $LogfileName = $ENV:COMPUTERNAME + "_" + (get-date -Format "yyyyMMdd") + ".log"
         return $LogfileName
     }
-    
-    Function New-DailyLogfileName {
-        Param(
-            [Parameter(Mandatory = $true)]
-            [string]
-            $WorkingDir,
-            [Parameter(Mandatory = $true)]
-            [string]
-            $BaseName
-        )
-        $LogfileName = $BaseName + "_" + (get-date -Format "yyyyMMdd") + ".log"
-        return (Join-Path -Path (Get-LogFilesFolder $WorkingDir) -ChildPath $LogfileName)
-    }
-    
 function  New-CustomDailyLogfileName  {
     param (
         [Parameter(Mandatory = $true)]
@@ -396,7 +383,6 @@ function Write-LogEntryLogFile {
         [string]
         $LogFile
     )
-#    $LogEntry | Out-File -FilePath $LogFile -Append -Force
     Add-Content -Value $LogEntry -Path $LogFile -Force
 }
 
