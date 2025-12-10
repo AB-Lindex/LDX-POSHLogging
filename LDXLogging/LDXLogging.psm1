@@ -94,7 +94,8 @@ Write-Log -LogEntry "Entry 01" -LogFileParameters $LogParams -LogFile $LogFile
             }
 
             if ($Logfile) {
-                Write-LogEntryLogFile -LogEntry $LogEntryFormatted -LogFile $Logfile
+#                Write-LogEntryLogFile -LogEntry $LogEntryFormatted -LogFile $Logfile
+                Write-LogEntry2025 -LogEntry $LogEntryFormatted -LogFile $Logfile
             }
 
             if ($LogFileParameters.Tee -or !$LogFileParameters) {
@@ -384,6 +385,36 @@ function Write-LogEntryLogFile {
         $LogFile
     )
     Add-Content -Value $LogEntry -Path $LogFile -Force
+}
+
+function Write-LogEntry2025 {
+    Param(
+        [Parameter(Mandatory = $true)]
+        [string]$LogEntry,
+        [Parameter(Mandatory = $true)]
+        [string]$LogFile
+    )
+    
+    $stream = $null
+    $writer = $null
+    
+    try {
+        # Open with shared read access so Get-Content can read while writing
+        $stream = [System.IO.File]::Open(
+            $LogFile,
+            [System.IO.FileMode]::Append,
+            [System.IO.FileAccess]::Write,
+            [System.IO.FileShare]::Read
+        )
+        
+        $writer = New-Object System.IO.StreamWriter($stream)
+        $writer.WriteLine($LogEntry)
+        $writer.Flush()  # ← Force data to disk immediately
+    }
+    finally {
+        if ($writer) { $writer.Close() }
+        if ($stream) { $stream.Close() }
+    }
 }
 
 function Send-Email {
