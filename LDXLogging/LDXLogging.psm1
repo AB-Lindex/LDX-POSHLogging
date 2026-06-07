@@ -84,18 +84,18 @@
     [bool]$HouseKeepingTodo = $false
     $ScriptName = $MyInvocation.ScriptName
     if ($LogEntry) { 
-         if (!$ScriptName) {
+         if (!$ScriptName -and !($logfileParameters.screenOnly)) {
             Write-Output "This command has to run from a script, not from the command line"
         } else {
             $LogTodo = $true
             $LogEntryFormatted = (Set-LogEntryFormat -LogEntry $LogEntry -Severity $Severity)
-            $BaseName=(Get-Item $ScriptName).BaseName
             if ($LogFileParameters.LogFile) {
                 $LogFile = $LogFileParameters.LogFile
             }
  
             if (!$LogFileParameters.ScreenOnly) {
                 if (!$LogFile) {
+                    $BaseName=(Get-Item $ScriptName).BaseName
                     if ($LogFileParameters.DailyLogFile -or !$LogFileParameters) {
                         if (!$LogFileParameters.LogPath) {
                             $WorkingDir = (Split-Path -Parent $ScriptName)
@@ -466,7 +466,7 @@ function Write-SyslogEntry {
     $UDPCLient.Dispose()
 }
 
-function Write-LogEntryLogFile {
+function Write-LogEntryLogFile-Notinuse {
     Param(
         [Parameter(Mandatory = $true)]
         [string]
